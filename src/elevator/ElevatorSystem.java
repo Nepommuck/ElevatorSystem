@@ -13,6 +13,9 @@ public class ElevatorSystem {
         this(new ArrayList<>(Collections.nCopies(numberOfElevators, baseFloor)));
     }
     public ElevatorSystem(ArrayList<Integer> baseFloors) {
+        if (baseFloors.size() == 0 || baseFloors.size() > 12)
+            throw new IllegalArgumentException("Number of elevators must be between 1 and 12.");
+
         for (Integer floor : baseFloors)
             elevators.add(
                     new Elevator(floor)
@@ -26,7 +29,18 @@ public class ElevatorSystem {
 
     // Temporary
     public void addCall(ElevatorCall call) {
-        elevators.get(0).addCall(call);
+        Elevator bestCandidate = elevators.get(0);
+        int smallestResult = Integer.MAX_VALUE;
+
+        for (Elevator elevator : elevators) {
+            if (elevator.hasSpecificCall(call))
+                return;
+            if (elevator.getCallsNumber() < smallestResult) {
+                smallestResult = elevator.getCallsNumber();
+                bestCandidate = elevator;
+            }
+        }
+        bestCandidate.addCall(call);
     }
     public void addInnerElevatorCall(int index, ElevatorCall call) {
         elevators.get(index).addCall(call);

@@ -94,6 +94,14 @@ public class Elevator {
             currentDirection = (call.floor > currentFloor) ? MoveDirection.UPWARD : MoveDirection.DOWNWARD;
     }
 
+    public boolean hasSpecificCall(ElevatorCall call) {
+        return calls.contains(call);
+    }
+
+    public int getCallsNumber() {
+        return calls.size();
+    }
+
     public int getCurrentFloor() {
         return currentFloor;
     }

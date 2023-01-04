@@ -13,7 +13,7 @@ public class Main {
         calls.add(new ElevatorCall(0, MoveDirection.UPWARD));
         calls.add(new ElevatorCall(9, null));
 
-        SimulationEngine engine = new SimulationEngine(1, calls);
+        SimulationEngine engine = new SimulationEngine(2, calls);
         engine.run();
     }
 }
