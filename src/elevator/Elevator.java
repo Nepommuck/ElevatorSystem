@@ -7,6 +7,7 @@ public class Elevator {
     private MoveDirection currentDirection;
     private int goalFloor;
     private final ArrayList<ElevatorCall> calls = new ArrayList<>();
+    private final PriorityComparator priorityComparator = new PriorityComparator(this);
 
     public Elevator() {
         this(0);
@@ -17,14 +18,39 @@ public class Elevator {
         currentDirection = MoveDirection.STATIONARY;
     }
 
-    void addCall(ElevatorCall call) {
-        if (call.floor == currentFloor && currentDirection == MoveDirection.STATIONARY)
+    void addCall(ElevatorCall newCall) {
+        if (newCall.floor == currentFloor && currentDirection == MoveDirection.STATIONARY)
             return;
 
-        calls.add(call);
+        int index = 0;
+        for (ElevatorCall call : calls) {
+            if (call.equals(newCall))
+                return;
+
+            if (priorityComparator.overshadow(newCall, call))
+                break;
+            index += 1;
+        }
+
+        // Found an overshadowing call
+        if (index < calls.size()) {
+            newCall = priorityComparator.getOvershadowed(newCall);
+            calls.remove(index);
+        }
+
+        index = 0;
+        for (ElevatorCall call : calls) {
+            if (priorityComparator.compare(newCall, call) < 0)
+                break;
+            index += 1;
+        }
+        calls.add(index, newCall);
+
         if (calls.size() == 1)
-            setGoal(call);
+            setGoal(newCall);
     }
+
+
 
     void updatePosition() {
         if (currentDirection == MoveDirection.STATIONARY)
@@ -60,6 +86,13 @@ public class Elevator {
         goalFloor = call.floor;
         if (goalFloor != currentFloor)
             currentDirection = (call.floor > currentFloor) ? MoveDirection.UPWARD : MoveDirection.DOWNWARD;
+    }
+
+    public int getCurrentFloor() {
+        return currentFloor;
+    }
+    public MoveDirection getCurrentDirection() {
+        return currentDirection;
     }
 
     @Override
