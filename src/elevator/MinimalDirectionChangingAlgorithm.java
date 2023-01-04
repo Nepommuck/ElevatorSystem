@@ -1,7 +1,7 @@
 package elevator;
 
-public class minimalDirectionChangingAlgorithm extends AbstractPriorityComparison {
-    public minimalDirectionChangingAlgorithm(Elevator elevator) {
+public class MinimalDirectionChangingAlgorithm extends AbstractPriorityComparison {
+    public MinimalDirectionChangingAlgorithm(Elevator elevator) {
         super(elevator);
     }
 

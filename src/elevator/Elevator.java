@@ -7,7 +7,7 @@ public class Elevator {
     private MoveDirection currentDirection;
     private int goalFloor;
     private final ArrayList<ElevatorCall> calls = new ArrayList<>();
-    private final AbstractPriorityComparison priorityComparator = new minimalDirectionChangingAlgorithm(this);
+    private final AbstractPriorityComparison priorityComparator = new MinimalDirectionChangingAlgorithm(this);
 
     public Elevator() {
         this(0);
