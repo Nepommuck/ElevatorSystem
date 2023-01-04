@@ -7,7 +7,10 @@ public class ElevatorSystem {
     private final ArrayList<Elevator> elevators = new ArrayList<>();
 
     public ElevatorSystem(int numberOfElevators) {
-        this(new ArrayList<>(Collections.nCopies(numberOfElevators, 0)));
+        this(numberOfElevators, 0);
+    }
+    public ElevatorSystem(int numberOfElevators, int baseFloor) {
+        this(new ArrayList<>(Collections.nCopies(numberOfElevators, baseFloor)));
     }
     public ElevatorSystem(ArrayList<Integer> baseFloors) {
         for (Integer floor : baseFloors)

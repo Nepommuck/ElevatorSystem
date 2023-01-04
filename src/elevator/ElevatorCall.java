@@ -25,4 +25,9 @@ public class ElevatorCall{
     public int hashCode() {
         return Objects.hash(floor, direction);
     }
+
+    @Override
+    public String toString() {
+        return "(floor: " + this.floor + ", dir: " + this.direction + ")";
+    }
 }

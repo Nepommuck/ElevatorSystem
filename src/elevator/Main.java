@@ -7,9 +7,9 @@ public class Main {
         ArrayList<ElevatorCall> calls = new ArrayList<>();
         calls.add(new ElevatorCall(3, MoveDirection.DOWNWARD));
         calls.add(new ElevatorCall(0, null));
-        calls.add(new ElevatorCall(5, MoveDirection.DOWNWARD));
+        calls.add(new ElevatorCall(6, MoveDirection.DOWNWARD));
         calls.add(new ElevatorCall(1, MoveDirection.UPWARD));
-//        calls.add(new ElevatorCall(7, null));
+        calls.add(new ElevatorCall(5, MoveDirection.UPWARD));
         calls.add(new ElevatorCall(0, MoveDirection.UPWARD));
         calls.add(new ElevatorCall(9, null));
 

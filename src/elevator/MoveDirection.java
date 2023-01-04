@@ -12,4 +12,12 @@ public enum MoveDirection {
             case STATIONARY -> STATIONARY;
         };
     }
+
+    public int asSign() {
+        return switch (this) {
+            case UPWARD -> 1;
+            case DOWNWARD -> -1;
+            case STATIONARY -> 0;
+        };
+    }
 }

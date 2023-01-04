@@ -7,7 +7,7 @@ public class SimulationEngine {
     private final ArrayList<ElevatorCall> calls;
 
     public SimulationEngine(int numberOfElevators, ArrayList<ElevatorCall> calls) {
-        system = new ElevatorSystem(numberOfElevators);
+        system = new ElevatorSystem(numberOfElevators, 5);
         this.calls = calls;
     }
 
@@ -15,7 +15,7 @@ public class SimulationEngine {
         for(ElevatorCall call : calls)
             system.addCall(call);
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 20; i++) {
             System.out.println("Day " + i);
             System.out.println(system);
 

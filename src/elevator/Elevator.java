@@ -7,7 +7,7 @@ public class Elevator {
     private MoveDirection currentDirection;
     private int goalFloor;
     private final ArrayList<ElevatorCall> calls = new ArrayList<>();
-    private final PriorityComparator priorityComparator = new PriorityComparator(this);
+    private final AbstractPriorityComparison priorityComparator = new minimalDirectionChangingAlgorithm(this);
 
     public Elevator() {
         this(0);
@@ -27,7 +27,7 @@ public class Elevator {
             if (call.equals(newCall))
                 return;
 
-            if (priorityComparator.overshadow(newCall, call))
+            if (priorityComparator.doOvershadow(newCall, call))
                 break;
             index += 1;
         }
@@ -35,6 +35,8 @@ public class Elevator {
         // Found an overshadowing call
         if (index < calls.size()) {
             newCall = priorityComparator.getOvershadowed(newCall);
+
+            System.out.println("Removed: " + calls.get(index));
             calls.remove(index);
         }
 
@@ -45,11 +47,12 @@ public class Elevator {
             index += 1;
         }
         calls.add(index, newCall);
-
-        if (calls.size() == 1)
+        System.out.println("Added: " + newCall);
+        if (index == 0)
             setGoal(newCall);
+        System.out.println(currentDirection);
+        System.out.println(calls);
     }
-
 
 
     void updatePosition() {
@@ -67,6 +70,8 @@ public class Elevator {
     }
 
     private void removeFulfilledCall() {
+        System.out.println("Reached: " + calls.get(0));
+
         calls.remove(0);
         if (calls.size() == 0)
             setGoal(null);
@@ -77,6 +82,7 @@ public class Elevator {
 
     // null call sets elevator into waiting state
     private void setGoal(ElevatorCall call) {
+        System.out.println("Set goal: " + call);
         currentDirection = MoveDirection.STATIONARY;
         if (call == null) {
             goalFloor = currentFloor;
