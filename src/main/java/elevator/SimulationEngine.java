@@ -5,14 +5,12 @@ import java.util.ArrayList;
 public class SimulationEngine implements Runnable {
     private final ElevatorSystem system;
     private final ArrayList<ElevatorCall> calls;
-    private final IPositionChangeObserver observer;
     private boolean running = true;
 
 
     public SimulationEngine(int numberOfElevators, ArrayList<ElevatorCall> calls, IPositionChangeObserver observer) {
         system = new ElevatorSystem(numberOfElevators, observer);
         this.calls = (calls != null) ? calls : new ArrayList<>();
-        this.observer = observer;
     }
 
     @Override
@@ -20,11 +18,7 @@ public class SimulationEngine implements Runnable {
         for(ElevatorCall call : calls)
             system.addCall(call);
 
-        int day = 0;
         while (running) {
-            System.out.println("Day " + day);
-            System.out.println(system);
-
             system.update();
 
             try {
@@ -36,7 +30,10 @@ public class SimulationEngine implements Runnable {
         }
     }
 
-    public void passCall(ElevatorCall call) {
-        system.addCall(call);
+    public void passCall(int id, ElevatorCall call) {
+        if (id < 0)
+            system.addCall(call);
+        else
+            system.addInnerElevatorCall(id, call);
     }
 }

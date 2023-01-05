@@ -44,7 +44,6 @@ public class Elevator {
         if (index < calls.size()) {
             newCall = priorityComparator.getOvershadowed(newCall);
 
-            System.out.println("Removed: " + calls.get(index));
             calls.remove(index);
         }
 
@@ -55,11 +54,8 @@ public class Elevator {
             index += 1;
         }
         calls.add(index, newCall);
-        System.out.println("Added: " + newCall);
         if (index == 0)
             setGoal(newCall);
-        System.out.println(currentDirection);
-        System.out.println(calls);
     }
 
 
@@ -102,8 +98,6 @@ public class Elevator {
     }
 
     private void removeFulfilledCall() {
-        System.out.println("Reached: " + calls.get(0));
-
         calls.remove(0);
         if (calls.size() == 0)
             setGoal(null);
@@ -114,7 +108,6 @@ public class Elevator {
 
     // null call sets elevator into waiting state
     private void setGoal(ElevatorCall call) {
-        System.out.println("Set goal: " + call);
         currentDirection = MoveDirection.STATIONARY;
         if (call == null) {
             goalFloor = currentFloor;

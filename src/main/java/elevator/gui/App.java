@@ -2,6 +2,7 @@ package elevator.gui;
 
 import elevator.*;
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,17 +11,16 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class App extends Application implements IPositionChangeObserver {
     private Scene scene;
     private Stage stage;
-    private GridPane floorButtonsGrid;
+    private GridPane gridPane;
     private Label elevatorStateLabel;
     private final ArrayList<ElevatorGraphicalInterface> graphicalElevators = new ArrayList<>();
     private final ArrayList<VBox> elevatorIcons = new ArrayList<>();
-    int numberOfElevators = 1;
+    int numberOfElevators = 6;
     int minFloor = -1;
     int maxFloor = 10;
     int basicFloor = 0;
@@ -30,63 +30,60 @@ public class App extends Application implements IPositionChangeObserver {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        SimulationEngine engine = new SimulationEngine(1, null, this);
+        SimulationEngine engine = new SimulationEngine(numberOfElevators, null, this);
         Thread engineThread = new Thread(engine);
 
 
         stage = primaryStage;
         primaryStage.setTitle("Lab 7");
 
-        floorButtonsGrid = new GridPane();
+        gridPane = new GridPane();
 
+        // Floor labels
         for (int i = minFloor; i <= maxFloor; i++) {
             final int floor = i;
-            floorButtonsGrid.add(new Label(""+floor), 0, maxFloor-i);
+            Label label = new Label(""+floor);
+            gridPane.add(label, 2, maxFloor-i);
+            GridPane.setHalignment(label, HPos.CENTER);
 
             if (floor < maxFloor) {
                 Button UpButton = new Button("^");
                 UpButton.setOnAction(e -> {
-                    engine.passCall(new ElevatorCall(floor, MoveDirection.UPWARD));
+                    engine.passCall(-1, new ElevatorCall(floor, MoveDirection.UPWARD));
                 });
-                floorButtonsGrid.add(UpButton, 1, floorRowIndex(i));
+                gridPane.add(UpButton, 0, floorRowIndex(i));
             }
             if (floor > minFloor) {
                 Button UpButton = new Button("v");
                 UpButton.setOnAction(e -> {
-                    engine.passCall(new ElevatorCall(floor, MoveDirection.DOWNWARD));
+                    engine.passCall(-1, new ElevatorCall(floor, MoveDirection.DOWNWARD));
                 });
-                floorButtonsGrid.add(UpButton, 2, floorRowIndex(i));
+                gridPane.add(UpButton, 1, floorRowIndex(i));
             }
         }
 
         for (int i = 0; i < numberOfElevators; i++) {
-            graphicalElevators.add(new ElevatorGraphicalInterface(i));
-            floorButtonsGrid.add(graphicalElevators.get(i), i + 3, 16);
+            graphicalElevators.add(new ElevatorGraphicalInterface(i, minFloor, maxFloor, engine));
+            gridPane.add(graphicalElevators.get(i), i + 3, 16);
 
             elevatorIcons.add(new VBox());
             updateElevatorIcon(i, DoorState.OPEN, basicFloor);
         }
 
-        scene = new Scene(floorButtonsGrid, 800, 600);
+
+        gridPane.setHgap(3);
+        gridPane.setVgap(3);
+        gridPane.setPadding(new Insets(40, 10, 10, 40));
+
+        scene = new Scene(gridPane,
+                Math.max(800, 100 + 110 * numberOfElevators),
+                600);
 
         primaryStage.setScene(scene);
         primaryStage.show();
         engineThread.start();
+        stage.setResizable(false);
         stage.setOnCloseRequest(e -> engineThread.interrupt());
-    }
-
-    public ArrayList<ElevatorCall> getCalls(){
-        ArrayList<ElevatorCall> calls = new ArrayList<>();
-        calls.add(new ElevatorCall(4, null));
-//        calls.add(new ElevatorCall(3, MoveDirection.D));
-        calls.add(new ElevatorCall(0, null));
-        calls.add(new ElevatorCall(6, MoveDirection.DOWNWARD));
-        calls.add(new ElevatorCall(1, MoveDirection.UPWARD));
-        calls.add(new ElevatorCall(5, MoveDirection.UPWARD));
-        calls.add(new ElevatorCall(0, MoveDirection.UPWARD));
-        calls.add(new ElevatorCall(9, null));
-
-        return calls;
     }
 
     @Override
@@ -99,7 +96,7 @@ public class App extends Application implements IPositionChangeObserver {
         updateElevatorIcon(elevator.id, elevator.getDoorState(), elevator.getCurrentFloor());
     }
     private void updateElevatorIcon(int index, DoorState doorState, int currentFloor) {
-        floorButtonsGrid.getChildren().remove(elevatorIcons.get(index));
+        gridPane.getChildren().remove(elevatorIcons.get(index));
         Color color = switch (doorState) {
             case OPEN -> Color.GREEN;
             case CLOSING, OPEANING -> Color.GRAY;
@@ -107,7 +104,7 @@ public class App extends Application implements IPositionChangeObserver {
         };
         elevatorIcons.get(index).setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
         
-        floorButtonsGrid.add(elevatorIcons.get(index), index + 3,
+        gridPane.add(elevatorIcons.get(index), index + 3,
                 floorRowIndex(currentFloor));
     }
     
