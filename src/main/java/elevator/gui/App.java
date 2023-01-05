@@ -38,10 +38,6 @@ public class App extends Application {
         grid.add(delayCombo, 1, 3);
 
         CheckBox closeWindowCheckbox = new CheckBox("Close this window after starting the simulation");
-//        grid.add(new Label("Close this window after starting the simulation"), 1, 4);
-//        grid.add(closeWindowCheckbox, 0, 4);
-//        GridPane.setHalignment(closeWindowCheckbox, HPos.RIGHT);
-
         Button startButton = new Button("Start");
         grid.add(startButton, 1, 5);
 
