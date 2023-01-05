@@ -1,114 +1,91 @@
 package elevator.gui;
 
-import elevator.*;
 import javafx.application.Application;
-import javafx.geometry.HPos;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class App extends Application implements IPositionChangeObserver {
-    private Scene scene;
-    private Stage stage;
-    private GridPane gridPane;
-    private Label elevatorStateLabel;
-    private final ArrayList<ElevatorGraphicalInterface> graphicalElevators = new ArrayList<>();
-    private final ArrayList<VBox> elevatorIcons = new ArrayList<>();
-    int numberOfElevators = 6;
-    int minFloor = -1;
-    int maxFloor = 10;
-    int basicFloor = 0;
-
-    public App() {
-    }
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
-        SimulationEngine engine = new SimulationEngine(numberOfElevators, null, this);
-        Thread engineThread = new Thread(engine);
-
-
-        stage = primaryStage;
-        primaryStage.setTitle("Lab 7");
-
-        gridPane = new GridPane();
-
-        // Floor labels
-        for (int i = minFloor; i <= maxFloor; i++) {
-            final int floor = i;
-            Label label = new Label(""+floor);
-            gridPane.add(label, 2, maxFloor-i);
-            GridPane.setHalignment(label, HPos.CENTER);
-
-            if (floor < maxFloor) {
-                Button UpButton = new Button("^");
-                UpButton.setOnAction(e -> {
-                    engine.passCall(-1, new ElevatorCall(floor, MoveDirection.UPWARD));
-                });
-                gridPane.add(UpButton, 0, floorRowIndex(i));
-            }
-            if (floor > minFloor) {
-                Button UpButton = new Button("v");
-                UpButton.setOnAction(e -> {
-                    engine.passCall(-1, new ElevatorCall(floor, MoveDirection.DOWNWARD));
-                });
-                gridPane.add(UpButton, 1, floorRowIndex(i));
-            }
-        }
-
-        for (int i = 0; i < numberOfElevators; i++) {
-            graphicalElevators.add(new ElevatorGraphicalInterface(i, minFloor, maxFloor, engine));
-            gridPane.add(graphicalElevators.get(i), i + 3, 16);
-
-            elevatorIcons.add(new VBox());
-            updateElevatorIcon(i, DoorState.OPEN, basicFloor);
-        }
-
-
-        gridPane.setHgap(3);
-        gridPane.setVgap(3);
-        gridPane.setPadding(new Insets(40, 10, 10, 40));
-
-        scene = new Scene(gridPane,
-                Math.max(800, 100 + 110 * numberOfElevators),
-                600);
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        engineThread.start();
-        stage.setResizable(false);
-        stage.setOnCloseRequest(e -> engineThread.interrupt());
-    }
+public class App extends Application {
 
     @Override
-    public void positionChanged(Elevator elevator) {
-        graphicalElevators.get(elevator.id).update(elevator);
-        updateElevatorIcon(elevator);
+    public void start(Stage startStage) {
+        ArrayList<Integer> acceptedMinimalFloorValues = getArray(-3, 0);
+        ArrayList<Integer> acceptedMaximalFloorValues = getArray(4, 20);
+        ArrayList<Integer> acceptedElevatorsNumberValues = getArray(1, 12);
+        ArrayList<Integer> acceptedDelayValues = new ArrayList<>(Arrays.asList(500, 800, 1000, 2000, 3000, 5000));
+
+        GridPane grid = new GridPane();
+        ComboBox maximalFloorCombo = generateCombo(acceptedMaximalFloorValues, 4);
+        grid.add(new Label("Highest floor: "), 0, 0);
+        grid.add(maximalFloorCombo, 1, 0);
+
+        ComboBox minimalFloorCombo = generateCombo(acceptedMinimalFloorValues, 3);
+        grid.add(new Label("Lowest floor: "), 0, 1);
+        grid.add(minimalFloorCombo, 1, 1);
+
+        ComboBox elevatorsNumberCombo = generateCombo(acceptedElevatorsNumberValues, 1);
+        grid.add(new Label("Number of elevators: "), 0, 2);
+        grid.add(elevatorsNumberCombo, 1, 2);
+
+        ComboBox delayCombo = generateCombo(acceptedDelayValues, 2);
+        grid.add(new Label("Delay (ms): "), 0, 3);
+        grid.add(delayCombo, 1, 3);
+
+        CheckBox closeWindowCheckbox = new CheckBox("Close this window after starting the simulation");
+//        grid.add(new Label("Close this window after starting the simulation"), 1, 4);
+//        grid.add(closeWindowCheckbox, 0, 4);
+//        GridPane.setHalignment(closeWindowCheckbox, HPos.RIGHT);
+
+        Button startButton = new Button("Start");
+        grid.add(startButton, 1, 5);
+
+        grid.setHgap(5);
+        grid.setVgap(20);
+        grid.setPadding(new Insets(40, 10, 10, 40));
+
+        GridPane menuPane = new GridPane();
+        menuPane.add(grid, 0, 0);
+        menuPane.add(closeWindowCheckbox, 0, 1);
+        menuPane.add(startButton, 0, 2);
+
+        menuPane.setHgap(5);
+        menuPane.setVgap(20);
+        menuPane.setPadding(new Insets(10, 10, 10, 40));
+
+        Scene scene = new Scene(new BorderPane(menuPane, grid, null, null, null), 800, 600);
+        startStage.setScene(scene);
+        startStage.show();
+        startStage.setTitle("Elevator Simulator - configuration");
+
+        startButton.setOnAction(e -> {
+            new SimulationStage(
+                    (Integer) elevatorsNumberCombo.getValue(),
+                    (Integer) minimalFloorCombo.getValue(),
+                    (Integer) maximalFloorCombo.getValue(),
+                    (Integer) delayCombo.getValue()
+            );
+            if (closeWindowCheckbox.isSelected())
+                startStage.close();
+        });
     }
-    
-    private void updateElevatorIcon(Elevator elevator) {
-        updateElevatorIcon(elevator.id, elevator.getDoorState(), elevator.getCurrentFloor());
+
+    private ComboBox generateCombo(ArrayList<Integer> constraints, int basicIndex) {
+        ComboBox combo = new ComboBox(FXCollections.observableArrayList(constraints));
+        combo.getSelectionModel().select(basicIndex);
+        return combo;
     }
-    private void updateElevatorIcon(int index, DoorState doorState, int currentFloor) {
-        gridPane.getChildren().remove(elevatorIcons.get(index));
-        Color color = switch (doorState) {
-            case OPEN -> Color.GREEN;
-            case CLOSING, OPEANING -> Color.GRAY;
-            case CLOSED -> Color.BLACK;
-        };
-        elevatorIcons.get(index).setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
-        
-        gridPane.add(elevatorIcons.get(index), index + 3,
-                floorRowIndex(currentFloor));
-    }
-    
-    private int floorRowIndex(int floor) {
-        return maxFloor - floor;
+
+    private ArrayList<Integer> getArray(int from, int to) {
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = from; i <= to; i++) {
+            result.add(i);
+        }
+        return result;
     }
 }

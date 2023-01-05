@@ -6,11 +6,13 @@ public class SimulationEngine implements Runnable {
     private final ElevatorSystem system;
     private final ArrayList<ElevatorCall> calls;
     private boolean running = true;
+    private final int delay;
 
-
-    public SimulationEngine(int numberOfElevators, ArrayList<ElevatorCall> calls, IPositionChangeObserver observer) {
-        system = new ElevatorSystem(numberOfElevators, observer);
+    public SimulationEngine(int numberOfElevators, ArrayList<ElevatorCall> calls, IPositionChangeObserver observer,
+                            int delay, int basicFloor) {
+        system = new ElevatorSystem(numberOfElevators, basicFloor, observer);
         this.calls = (calls != null) ? calls : new ArrayList<>();
+        this.delay = delay;
     }
 
     @Override
@@ -22,7 +24,7 @@ public class SimulationEngine implements Runnable {
             system.update();
 
             try {
-                java.lang.Thread.sleep(1000);
+                java.lang.Thread.sleep(delay);
             } catch (InterruptedException e) {
                 System.out.println("Simulation interrupted");
                 running = false;

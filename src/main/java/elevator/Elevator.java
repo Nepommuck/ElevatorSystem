@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import java.util.ArrayList;
 
 public class Elevator {
+    public final int id;
     private int currentFloor;
     private MoveDirection currentDirection;
     private int goalFloor;
@@ -12,11 +13,7 @@ public class Elevator {
     private final ArrayList<ElevatorCall> calls = new ArrayList<>();
     private final AbstractPriorityComparison priorityComparator = new MinimalDirectionChangingAlgorithm(this);
     private final IPositionChangeObserver observer;
-    public final int id;
 
-    public Elevator(int id) {
-        this(0, id, null);
-    }
     public Elevator(int floor, int id, IPositionChangeObserver observer) {
         currentFloor = floor;
         goalFloor = currentFloor;
@@ -57,7 +54,6 @@ public class Elevator {
         if (index == 0)
             setGoal(newCall);
     }
-
 
     void updatePosition() {
         // Doors are currently moving
@@ -117,6 +113,12 @@ public class Elevator {
         goalFloor = call.floor;
         if (goalFloor != currentFloor)
             currentDirection = (call.floor > currentFloor) ? MoveDirection.UPWARD : MoveDirection.DOWNWARD;
+    }
+
+    public int getLastCallFloor() {
+        if (currentDirection == MoveDirection.STATIONARY)
+            return currentFloor;
+        return calls.get(calls.size() - 1).floor;
     }
 
     public boolean hasSpecificCall(ElevatorCall call) {
