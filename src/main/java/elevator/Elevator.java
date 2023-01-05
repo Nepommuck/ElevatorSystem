@@ -1,25 +1,33 @@
 package elevator;
 
+import javafx.application.Platform;
+
 import java.util.ArrayList;
 
 public class Elevator {
     private int currentFloor;
     private MoveDirection currentDirection;
     private int goalFloor;
+    private DoorState doorState = DoorState.OPEN;
     private final ArrayList<ElevatorCall> calls = new ArrayList<>();
     private final AbstractPriorityComparison priorityComparator = new MinimalDirectionChangingAlgorithm(this);
+    private final IPositionChangeObserver observer;
+    public final int id;
 
-    public Elevator() {
-        this(0);
+    public Elevator(int id) {
+        this(0, id, null);
     }
-    public Elevator(int floor) {
+    public Elevator(int floor, int id, IPositionChangeObserver observer) {
         currentFloor = floor;
         goalFloor = currentFloor;
         currentDirection = MoveDirection.STATIONARY;
+        this.observer = observer;
+        this.id = id;
     }
 
     void addCall(ElevatorCall newCall) {
-        if (newCall.floor == currentFloor && currentDirection == MoveDirection.STATIONARY)
+        // Adding this call makes no sense
+        if (newCall.floor == currentFloor && (doorState == DoorState.OPEN || doorState == DoorState.OPEANING))
             return;
 
         int index = 0;
@@ -56,8 +64,28 @@ public class Elevator {
 
 
     void updatePosition() {
-        if (currentDirection == MoveDirection.STATIONARY)
+        // Doors are currently moving
+        if (doorState.areMoving()) {
+            doorState = doorState.moveFurther();
+            Platform.runLater(() -> observer.positionChanged(this));
             return;
+        }
+
+        // No calls to do - let's open the elevator
+        if (currentDirection == MoveDirection.STATIONARY) {
+            if (doorState != DoorState.OPEN) {
+                doorState = doorState.openFurther();
+                Platform.runLater(() -> observer.positionChanged(this));
+            }
+            return;
+        }
+
+        // There is a call but also a need to close the elevator
+        if (doorState != DoorState.CLOSED) {
+            doorState = doorState.closeFurther();
+            Platform.runLater(() -> observer.positionChanged(this));
+            return;
+        }
 
         switch (currentDirection) {
             case UPWARD -> currentFloor++;
@@ -65,8 +93,12 @@ public class Elevator {
         }
 
         // Reached destination
-        if (currentFloor == goalFloor)
+        if (currentFloor == goalFloor) {
             removeFulfilledCall();
+            doorState = doorState.openFurther();
+        }
+        if (observer != null)
+            Platform.runLater(() -> observer.positionChanged(this));
     }
 
     private void removeFulfilledCall() {
@@ -107,6 +139,9 @@ public class Elevator {
     }
     public MoveDirection getCurrentDirection() {
         return currentDirection;
+    }
+    public DoorState getDoorState() {
+        return doorState;
     }
 
     @Override

@@ -6,19 +6,20 @@ import java.util.Collections;
 public class ElevatorSystem {
     private final ArrayList<Elevator> elevators = new ArrayList<>();
 
-    public ElevatorSystem(int numberOfElevators) {
-        this(numberOfElevators, 0);
+    public ElevatorSystem(int numberOfElevators, IPositionChangeObserver observer) {
+        this(numberOfElevators, 0, observer);
     }
-    public ElevatorSystem(int numberOfElevators, int baseFloor) {
-        this(new ArrayList<>(Collections.nCopies(numberOfElevators, baseFloor)));
+    public ElevatorSystem(int numberOfElevators, int baseFloor, IPositionChangeObserver observer) {
+        this(new ArrayList<>(Collections.nCopies(numberOfElevators, baseFloor)), observer);
     }
-    public ElevatorSystem(ArrayList<Integer> baseFloors) {
+    public ElevatorSystem(ArrayList<Integer> baseFloors, IPositionChangeObserver observer) {
         if (baseFloors.size() == 0 || baseFloors.size() > 12)
             throw new IllegalArgumentException("Number of elevators must be between 1 and 12.");
 
-        for (Integer floor : baseFloors)
+        int index = 0;
+        for (int i = 0; i < baseFloors.size(); i++)
             elevators.add(
-                    new Elevator(floor)
+                    new Elevator(baseFloors.get(i), i, observer)
             );
     }
 
