@@ -2,7 +2,7 @@ package elevator;
 
 import java.util.ArrayList;
 
-public class SimulationEngine {
+public class SimulationEngine implements Runnable {
     private final ElevatorSystem system;
     private final ArrayList<ElevatorCall> calls;
 
@@ -11,6 +11,7 @@ public class SimulationEngine {
         this.calls = calls;
     }
 
+    @Override
     public void run() {
         for(ElevatorCall call : calls)
             system.addCall(call);
