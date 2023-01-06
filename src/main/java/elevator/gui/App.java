@@ -17,7 +17,7 @@ public class App extends Application {
     public void start(Stage startStage) {
         ArrayList<Integer> acceptedMinimalFloorValues = getArray(-3, 0);
         ArrayList<Integer> acceptedMaximalFloorValues = getArray(4, 20);
-        ArrayList<Integer> acceptedElevatorsNumberValues = getArray(1, 12);
+        ArrayList<Integer> acceptedElevatorsNumberValues = getArray(1, 16);
         ArrayList<Integer> acceptedDelayValues = new ArrayList<>(Arrays.asList(500, 800, 1000, 2000, 3000, 5000));
 
         GridPane grid = new GridPane();

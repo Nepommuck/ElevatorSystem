@@ -13,8 +13,8 @@ public class ElevatorSystem {
         this(new ArrayList<>(Collections.nCopies(numberOfElevators, baseFloor)), observer);
     }
     public ElevatorSystem(ArrayList<Integer> baseFloors, IPositionChangeObserver observer) {
-        if (baseFloors.size() == 0 || baseFloors.size() > 12)
-            throw new IllegalArgumentException("Number of elevators must be between 1 and 12.");
+        if (baseFloors.size() == 0 || baseFloors.size() > 16)
+            throw new IllegalArgumentException("Number of elevators must be between 1 and 16.");
 
         for (int i = 0; i < baseFloors.size(); i++)
             elevators.add(

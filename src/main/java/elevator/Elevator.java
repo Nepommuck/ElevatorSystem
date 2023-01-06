@@ -132,6 +132,9 @@ public class Elevator {
     public int getCurrentFloor() {
         return currentFloor;
     }
+    public int getGoalFloor() {
+        return goalFloor;
+    }
     public MoveDirection getCurrentDirection() {
         return currentDirection;
     }
