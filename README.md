@@ -39,3 +39,10 @@ Analogicznie winda jadąca w dół będzie preferowała najpierw piętra niższe
 > Np. winda jest na 8 piętrze i porusza się w górę, a ktoś na 2 piętrze zamierza jechać do góry
 
 Jest to jedyna sytuacja, która pozostaje po wykluczeniu dwóch powyższych. Dotyczy zawsze wezwań w tym samym kierunku poruszania się, co obecny. Kolejność pięter jest analogiczna do sytuacji 1, tj.: winda jedzie w górę - najpierw niższe piętra; winda jedzie w dół - najpierw wyższe.
+
+## Prezentacja wizualna
+Ze względu na brak możliwości wymiernego przetestowania działania algorytmu w konsoli zdecydowałem się na dodanie interfejsu graficznego przy pomocy JavaFX.
+
+Zrzut ekranu finalnego efektu:
+
+![alt text](https://github.com/Nepommuck/ElevatorSystem/blob/master/readme-assets/screenshot.png?raw=true)
